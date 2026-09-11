@@ -3,8 +3,8 @@
 ### TODOs:
 
 - [X] Handle file uploads
-  - [ ] apply dependancy inversion pattern
-  - [ ] Handle unit tests
+  ~~- [ ] apply dependancy inversion pattern~~
+  - [X] Handle unit tests
 - [ ] Process files into binaries
 - [ ] Stream the binaries into the image service
 - [ ] Handle the binary -> image conversion

@@ -1,0 +1,40 @@
+###
+// Vaid file upload
+
+POST http://localhost:8080/upload HTTP/1.1
+Content-Type: multipart/form-data; boundary=vscoderestclientboundary
+
+--vscoderestclientboundary
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+< ./tests/data/test.txt
+--vscoderestclientboundary--
+
+###
+
+// Exact-Limit file upload
+
+POST http://localhost:8080/upload HTTP/1.1
+Content-Type: multipart/form-data; boundary=vscoderestclientboundary
+
+--vscoderestclientboundary
+Content-Disposition: form-data; name="file"; filename="size_limit_test.txt"
+Content-Type: text/plain
+
+< ./tests/data/size_limit_test.txt
+--vscoderestclientboundary--
+
+###
+
+// Over size limit file upload
+
+POST http://localhost:8080/upload HTTP/1.1
+Content-Type: multipart/form-data; boundary=vscoderestclientboundary
+
+--vscoderestclientboundary
+Content-Disposition: form-data; name="file"; filename="bulk_test.txt"
+Content-Type: text/plain
+
+< ./tests/data/bulk_test.txt
+--vscoderestclientboundary--
