@@ -33,8 +33,8 @@ func CreateTempFile(fileName, reqId string) (*os.File, error) {
 	return dst, nil
 }
 
-func DeleteTempFile(dst *os.File) error {
-	err := os.Remove(dst.Name())
+func DeleteTempFile(path string) error {
+	err := os.Remove(path)
 	if err != nil {
 		return err
 	}
