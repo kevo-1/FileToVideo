@@ -34,21 +34,23 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 	log.Printf("File Size: %d\n", handler.Size)
 
 	reqId := uuid.NewString()
-	dst, err := services.CreateTempFile(handler.Filename, reqId)
 
+	dst, err := services.CreateTempFile(handler.Filename, reqId)
 	if err != nil {
 		http.Error(w, "Error saving the file", http.StatusInternalServerError)
 		return
 	}
 
-	defer dst.Close()
-
 	if _, err := dst.ReadFrom(file); err != nil {
+		path := dst.Name()
 		dst.Close()
-		services.DeleteTempFile(dst)
+		if delErr := services.DeleteTempFile(path); delErr != nil {
+			log.Printf("failed to delete temp file after write error: %v", delErr)
+		}
 		http.Error(w, "Error saving the file", http.StatusInternalServerError)
 		return
 	}
+	defer dst.Close()
 
 	w.WriteHeader(http.StatusAccepted)
 	json.NewEncoder(w).Encode(map[string]string{"requestId": reqId})
