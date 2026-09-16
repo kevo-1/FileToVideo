@@ -39,6 +39,14 @@ func (tf *TempFile) Write(p []byte) (int, error) {
 	return tf.Handle.Write(p)
 }
 
+func (tf *TempFile) Read() ([]byte, error) {
+	data, err := os.ReadFile(tf.Path())
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read file: %s", err)
+	}
+	return data, nil
+}
+
 const UploadDir = "uploads"
 
 type TempFileRepo struct {
