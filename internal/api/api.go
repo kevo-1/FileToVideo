@@ -56,14 +56,11 @@ func (s *Server) Run() error {
 		}
 	case <-ctx.Done():
 		log.Println("Shutdown signal received!")
-
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
-
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
 			log.Printf("error during server shutdown: %v", err)
 		}
-
 		if err := tmpFileRepo.Close(); err != nil {
 			log.Printf("error closing temp file repo: %v", err)
 		}
