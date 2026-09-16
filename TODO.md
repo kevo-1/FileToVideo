@@ -5,7 +5,9 @@
 - [X] Handle file uploads
   ~~- [ ] apply dependancy inversion pattern~~
   - [X] Handle unit tests
-- [ ] Process files into binaries
+- [X] Process files into binaries
+  - [ ] Save Files properly
+  - [ ] Integrate into the pipeline
 - [ ] Stream the binaries into the image service
 - [ ] Handle the binary -> image conversion
 - [ ] Stream image into video service
