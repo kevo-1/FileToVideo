@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/kevo-1/FileToVideo/internal/infrastructure"
 	"github.com/kevo-1/FileToVideo/internal/repository"
 )
 
@@ -15,7 +16,7 @@ const MaxUploadSizeBytes = 10 << 20
 
 // Start by parsing the file from the request
 // Then log it's metadata, and create a tempfile for processing later on
-func HandleUpload(w http.ResponseWriter, r *http.Request, tmpFileRepo *repository.TempFileRepo) {
+func HandleUpload(w http.ResponseWriter, r *http.Request, tmpFileRepo *repository.TempFileRepo, fileQueue *infrastructure.FileQueue) {
 	r.Body = http.MaxBytesReader(w, r.Body, MaxUploadSizeBytes)
 
 	if err := r.ParseMultipartForm(MaxUploadSizeBytes); err != nil {
@@ -58,6 +59,8 @@ func HandleUpload(w http.ResponseWriter, r *http.Request, tmpFileRepo *repositor
 		http.Error(w, "Error saving the file", http.StatusInternalServerError)
 		return
 	}
+
+	fileQueue.EnqueueTask(*tmpFile)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)

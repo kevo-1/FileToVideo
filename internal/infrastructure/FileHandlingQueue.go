@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/kevo-1/FileToVideo/internal/repository"
+	"github.com/kevo-1/FileToVideo/internal/services"
 )
 
 type Task struct {
@@ -33,6 +34,7 @@ func (fq *FileQueue) worker(id int) {
 	for task := range fq.tasksQueue {
 		fmt.Printf("Worker %d processing task %s: %s\n", id, task.file.ReqId, task.file.FileName)
 		//file with the processing
+		services.ProcessFile(task.file)
 		fq.wg.Done()
 	}
 }

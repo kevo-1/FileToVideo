@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/kevo-1/FileToVideo/internal/infrastructure"
 	"github.com/kevo-1/FileToVideo/internal/repository"
 )
 
@@ -20,15 +21,22 @@ func NewServer(addr string) *Server {
 	return &Server{addr: addr}
 }
 
+const (
+	WorkerCount     = 10
+	QueueBufferSize = 100
+)
+
 func (s *Server) Run() error {
 	tmpFileRepo, err := repository.NewTempFileRepo()
 	if err != nil {
 		return err
 	}
 
+	fileQueue := infrastructure.NewFileQueue(WorkerCount, QueueBufferSize)
+
 	router := http.NewServeMux()
 	router.HandleFunc("POST /upload", func(w http.ResponseWriter, r *http.Request) {
-		HandleUpload(w, r, tmpFileRepo)
+		HandleUpload(w, r, tmpFileRepo, fileQueue)
 	})
 
 	httpServer := &http.Server{
