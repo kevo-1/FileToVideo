@@ -69,6 +69,7 @@ func (s *Server) Run() error {
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
 			log.Printf("error during server shutdown: %v", err)
 		}
+		fileQueue.Wait()
 		if err := tmpFileRepo.Close(); err != nil {
 			log.Printf("error closing temp file repo: %v", err)
 		}
