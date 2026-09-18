@@ -7,7 +7,7 @@ import (
 	"github.com/kevo-1/FileToVideo/internal/repository"
 )
 
-func ProcessFile(tempFile repository.TempFile) error {
+func ProcessFile(tempFile *repository.TempFile) error {
 	// First we process the file into binary
 	data, err := tempFile.Read()
 

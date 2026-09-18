@@ -60,7 +60,7 @@ func HandleUpload(w http.ResponseWriter, r *http.Request, tmpFileRepo *repositor
 		return
 	}
 
-	fileQueue.EnqueueTask(*tmpFile)
+	fileQueue.EnqueueTask(tmpFile)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)

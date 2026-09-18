@@ -10,7 +10,7 @@ import (
 
 type Task struct {
 	reqId string
-	file  repository.TempFile
+	file  *repository.TempFile
 }
 
 type FileQueue struct {
@@ -39,7 +39,7 @@ func (fq *FileQueue) worker(id int) {
 	}
 }
 
-func (fq *FileQueue) EnqueueTask(tempFile repository.TempFile) {
+func (fq *FileQueue) EnqueueTask(tempFile *repository.TempFile) {
 	task := &Task{
 		tempFile.ReqId,
 		tempFile,

@@ -15,36 +15,70 @@ const (
 )
 
 type TempFile struct {
+	mu       sync.Mutex
 	ReqId    string
 	FileName string
-	Handle   *os.File
+	handle   *os.File
 	path     string
 }
 
-func (tf *TempFile) Path() string { return tf.path }
+func (tf *TempFile) Path() string {
+	tf.mu.Lock()
+	defer tf.mu.Unlock()
+	return tf.path
+}
 
 func (tf *TempFile) Close() error {
-	if tf.Handle == nil {
+	tf.mu.Lock()
+	defer tf.mu.Unlock()
+	if tf.handle == nil {
 		return nil
 	}
-	err := tf.Handle.Close()
-	tf.Handle = nil
+	err := tf.handle.Close()
+	tf.handle = nil
 	return err
 }
 
 func (tf *TempFile) Write(p []byte) (int, error) {
-	if tf.Handle == nil {
+	tf.mu.Lock()
+	defer tf.mu.Unlock()
+	if tf.handle == nil {
 		return 0, fmt.Errorf("temp file not ready")
 	}
-	return tf.Handle.Write(p)
+	return tf.handle.Write(p)
 }
 
 func (tf *TempFile) Read() ([]byte, error) {
-	data, err := os.ReadFile(tf.Path())
+	tf.mu.Lock()
+	path := tf.path
+	tf.mu.Unlock()
+
+	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to read file: %s", err)
+		return nil, fmt.Errorf("reading temp file: %w", err)
 	}
 	return data, nil
+}
+
+func (tf *TempFile) ChangeFileType(newExt string) error {
+	if newExt == "" {
+		return fmt.Errorf("changing file type: new extension is required")
+	}
+
+	tf.mu.Lock()
+	defer tf.mu.Unlock()
+
+	if tf.handle != nil {
+		return fmt.Errorf("changing file type: file is still open for writing")
+	}
+
+	newPath := fmt.Sprintf("%s.%s", tf.path, newExt)
+	if err := os.Rename(tf.path, newPath); err != nil {
+		return fmt.Errorf("changing file type: %w", err)
+	}
+
+	tf.path = newPath
+	return nil
 }
 
 const UploadDir = "uploads"
@@ -95,7 +129,7 @@ func (tfr *TempFileRepo) CreateTempFile(fileName, reqId string) (*TempFile, erro
 		_ = os.Remove(path)
 		return nil, fmt.Errorf("creating temp file: reservation for id = %s was removed concurrently", reqId)
 	}
-	entry.Handle = dst
+	entry.handle = dst
 	tfr.mu.Unlock()
 
 	return entry, nil
