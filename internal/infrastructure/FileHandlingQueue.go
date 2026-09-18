@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
@@ -35,7 +36,7 @@ func (fq *FileQueue) worker(id int) {
 	for task := range fq.tasksQueue {
 		fmt.Printf("Worker %d processing task %s: %s\n", id, task.file.ReqId, task.file.FileName)
 		//file with the processing
-		if err := services.ProcessFile(task.file); err != nil {
+		if _, err := services.ProcessFile(context.Background(), task.file); err != nil {
 			log.Printf("worker %d: processing failed for %s: %v", id, task.file.ReqId, err)
 		}
 		fq.wg.Done()
